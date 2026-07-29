@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Análise - Gauss</title>
+    
+    <!-- Importando a fonte Sora conforme o Design System -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Cores baseadas no Design System da Gauss */
+            --primary-color: #000000; /* Preto Gauss */
+            --accent-color: #00D26A;  /* Verde Gauss */
+            --bg-color: #F7F9FC;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --input-bg: #F8FAFC;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .form-container {
+            background-color: var(--card-bg);
+            max-width: 800px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .form-header p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: 300;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        input, select {
+            font-family: 'Sora', sans-serif;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            font-size: 14px;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.1);
+            background-color: #FFFFFF;
+        }
+
+        input::placeholder {
+            color: #94A3B8;
+        }
+
+        button.submit-btn {
+            font-family: 'Sora', sans-serif;
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button.submit-btn:hover:not(:disabled) {
+            background-color: #333333;
+        }
+
+        button.submit-btn:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Estilização específica para a área dinâmica */
+        #dynamic-generation-fields {
+            background-color: #F8FAFC;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+            display: none; /* Escondido por padrão */
+        }
+
+        #dynamic-generation-fields.active {
+            display: grid;
+        }
+
+        @media (max-width: 600px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .form-container {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <div class="form-header">
+            <h1>Nova Análise de Sistema</h1>
+            <p>Preencha as informações do cliente e o histórico de geração para prosseguir.</p>
+        </div>
+
+        <form id="analysisForm">
+            <!-- INFORMAÇÕES GERAIS -->
+            <div class="section-title">Informações Gerais</div>
+            <div class="grid-layout">
+                <div class="form-group full-width">
+                    <label for="cliente">Nome do cliente</label>
+                    <input type="text" id="cliente" name="cliente" placeholder="Ex: João da Silva" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="codigo">Código do projeto</label>
+                    <input type="text" id="codigo" name="codigo" placeholder="Ex: PRJ-2026-001" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="potencia">Potência do sistema (kWp)</label>
+                    <input type="number" step="0.01" id="potencia" name="potencia" placeholder="Ex: 5.4" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cidade">Cidade</label>
+                    <input type="text" id="cidade" name="cidade" placeholder="Ex: Salvador" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="data_troca">Data da troca do medidor</label>
+                    <input type="date" id="data_troca" name="data_troca" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="meses_analise">Meses da Análise (Histórico de Geração)</label>
+                    <select id="meses_analise" name="meses_analise" required>
+                        <option value="" disabled selected>Selecione a quantidade de meses</option>
+                        <option value="1">1 Mês</option>
+                        <option value="2">2 Meses</option>
+                        <option value="3">3 Meses</option>
+                        <option value="4">4 Meses</option>
+                        <option value="5">5 Meses</option>
+                        <option value="6">6 Meses</option>
+                        <option value="7">7 Meses</option>
+                        <option value="8">8 Meses</option>
+                        <option value="9">9 Meses</option>
+                        <option value="10">10 Meses</option>
+                        <option value="11">11 Meses</option>
+                        <option value="12">12 Meses</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- DADOS DE GERAÇÃO (GERADOS DINAMICAMENTE VIA JS) -->
+            <div id="generation-section" style="display: none;">
+                <div class="section-title">Geração Histórica (kWh)</div>
+                <div id="dynamic-generation-fields" class="grid-layout">
+                    <!-- Os inputs serão injetados aqui -->
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Salvar Informações</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mesesSelect = document.getElementById('meses_analise');
+            const dynamicContainer = document.getElementById('dynamic-generation-fields');
+            const generationSection = document.getElementById('generation-section');
+
+            mesesSelect.addEventListener('change', function() {
+                const numMeses = parseInt(this.value);
+                
+                // Limpa os campos anteriores
+                dynamicContainer.innerHTML = '';
+
+                if (isNaN(numMeses) || numMeses <= 0) {
+                    dynamicContainer.classList.remove('active');
+                    generationSection.style.display = 'none';
+                    return;
+                }
+
+                // Mostra a sessão
+                dynamicContainer.classList.add('active');
+                generationSection.style.display = 'block';
+
+                const dataAtual = new Date();
+
+                // Loop para criar os campos de forma regressiva
+                for (let i = 1; i <= numMeses; i++) {
+                    // Cria uma data retroativa (Mês atual - i)
+                    const dataPassada = new Date(dataAtual.getFullYear(), dataAtual.getMonth() - i, 1);
+                    
+                    // Pega o nome do mês em português
+                    let nomeMes = dataPassada.toLocaleString('pt-BR', { month: 'long' });
+                    // Capitaliza a primeira letra do mês
+                    nomeMes = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+                    const ano = dataPassada.getFullYear();
+
+                    // Criação da div do form-group
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+
+                    // Criação da Label
+                    const label = document.createElement('label');
+                    label.textContent = `${nomeMes} de ${ano}`;
+                    label.setAttribute('for', `geracao_${i}`);
+
+                    // Criação do Input
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.step = '0.01';
+                    input.id = `geracao_${i}`;
+                    // O atributo name é crucial aqui, pois será a chave do JSON no n8n
+                    input.name = `geracao_${nomeMes}_${ano}`; 
+                    input.placeholder = 'Geração em kWh';
+                    input.required = true;
+
+                    // Adiciona os elementos na tela
+                    formGroup.appendChild(label);
+                    formGroup.appendChild(input);
+                    dynamicContainer.appendChild(formGroup);
+                }
+            });
+
+            // Envio para o Webhook do n8n
+            document.getElementById('analysisForm').addEventListener('submit', async function(e) {
+                e.preventDefault(); // Evita que a página recarregue
+
+                // ---> COLOQUE A URL DO SEU WEBHOOK DO N8N AQUI <---
+                const n8nWebhookUrl = 'https://seu-n8n.com/webhook/seu-caminho';
+
+                const submitBtn = document.querySelector('.submit-btn');
+                const originalBtnText = submitBtn.textContent;
+                submitBtn.textContent = 'Enviando...';
+                submitBtn.disabled = true;
+
+                // Captura todos os dados do formulário
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch(n8nWebhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        alert('Dados enviados com sucesso para a Gauss!');
+                        this.reset(); // Limpa o formulário
+                        dynamicContainer.innerHTML = ''; // Limpa os meses dinâmicos
+                        dynamicContainer.classList.remove('active');
+                        generationSection.style.display = 'none';
+                    } else {
+                        alert('Erro ao enviar dados. Verifique a URL do Webhook.');
+                    }
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    alert('Erro de conexão com o servidor.');
+                } finally {
+                    submitBtn.textContent = originalBtnText;
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
