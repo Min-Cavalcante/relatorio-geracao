@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -204,6 +205,10 @@
                 grid-column: span 1;
             }
         }
+        /* Adicionado para quebra de página */
+        .page-break {
+            page-break-before: always;
+        }
     </style>
 </head>
 <body>
@@ -262,9 +267,15 @@
                 </select>
             </div>
         </div>
-        <div id="generation-section">
-            <div class="section-title">Geração Histórica (kWh)</div>
-            <div id="dynamic-generation-fields" class="grid-layout"></div>
+        <div class="page-break"> <!-- Adicionada quebra de página antes da seção -->
+            <div class="section-title">Geração mês a mês</div>
+            <div id="generation-section">
+                <div class="section-title">Geração Histórica (kWh)</div>
+                <div id="dynamic-generation-fields" class="grid-layout"></div>
+            </div>
+        </div>
+        <div class="page-break"> <!-- Adicionada quebra de página antes da seção (existe para casos futuros) -->
+            <div class="section-title">Detalhamento por mês</div>
         </div>
         <button type="submit" class="submit-btn">Salvar Informações</button>
         <button type="button" id="clearFormBtn" class="clear-btn">Limpar formulário</button>
@@ -391,3 +402,4 @@
 </script>
 </body>
 </html>
+```
