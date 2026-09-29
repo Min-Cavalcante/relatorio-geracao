@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -12,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            /* Cores baseadas no Design System da Gauss */
             --primary-color: #000000;
             --accent-color: #00D26A;
             --bg-color: #F7F9FC;
@@ -115,6 +115,7 @@
         input::placeholder {
             color: #94A3B8;
         }
+        /* Botão principal */
         button.submit-btn {
             font-family: 'Sora', sans-serif;
             background-color: var(--primary-color);
@@ -137,6 +138,7 @@
             cursor: not-allowed;
             opacity: 0.7;
         }
+        /* Botão limpar */
         button.clear-btn {
             font-family: 'Sora', sans-serif;
             background-color: #FFFFFF;
@@ -156,6 +158,7 @@
             border-color: #CBD5E1;
             color: #1E293B;
         }
+        /* Estilização específica para a área dinâmica */
         #dynamic-generation-fields {
             background-color: #F8FAFC;
             padding: 20px;
@@ -166,36 +169,95 @@
         #dynamic-generation-fields.active {
             display: grid;
         }
+        /* =========================
+           POP-UP DE SUCESSO
+           ========================= */
         .modal-overlay {
-            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
+            inset: 0;
+            background-color: rgba(15, 23, 42, 0.55);
+            display: none;
             align-items: center;
-            z-index: 1000;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.active {
+            display: flex;
         }
         .modal {
-            background-color: var(--card-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 400px;
-            text-align: center;
+            background-color: #FFFFFF;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            animation: modalAppear 0.2s ease-out;
+        }
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
         .modal-icon {
-            font-size: 48px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(0, 210, 106, 0.12);
             color: var(--accent-color);
-            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+        .modal h2 {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .modal p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 24px;
         }
         .modal-actions {
             display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
+            gap: 10px;
+        }
+        .modal-actions button {
+            flex: 1;
+            font-family: 'Sora', sans-serif;
+            padding: 13px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-clear-btn {
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            border: 1px solid var(--primary-color);
+        }
+        .modal-clear-btn:hover {
+            background-color: #333333;
+        }
+        .modal-close-btn {
+            background-color: #FFFFFF;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        .modal-close-btn:hover {
+            background-color: #F8FAFC;
         }
         @media (max-width: 600px) {
             .grid-layout {
@@ -204,10 +266,15 @@
             .form-group.full-width {
                 grid-column: span 1;
             }
-        }
-        /* Adicionado para quebra de página */
-        .page-break {
-            page-break-before: always;
+            .form-container {
+                padding: 24px;
+            }
+            .modal {
+                padding: 24px;
+            }
+            .modal-actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -218,40 +285,80 @@
         <p>Preencha as informações do cliente e o histórico de geração para prosseguir.</p>
     </div>
     <form id="analysisForm">
-        <div class="form-group full-width">
-            <label for="server-choice">Envie para:</label>
-            <select id="server-choice" name="server-choice" required>
-                <option value="" disabled>Selecione o destino</option>
-                <option value="gauss" selected>Server Gauss</option>
-                <option value="local">Local</option>
-            </select>
+        <!-- SELETOR PARA ESCOLHER O DESTINO DO FLUXO -->
+        <div class="section-title">Destino do Fluxo</div>
+        <div class="grid-layout">
+            <div class="form-group full-width">
+                <label for="destination">Escolha o destino do fluxo</label>
+                <select id="destination" name="destination" required>
+                    <option value="server_gauss" selected>Server Gauss</option>
+                    <option value="local">Local</option>
+                </select>
+            </div>
         </div>
+        <!-- INFORMAÇÕES GERAIS -->
         <div class="section-title">Informações Gerais</div>
         <div class="grid-layout">
             <div class="form-group full-width">
                 <label for="cliente">Nome do cliente</label>
-                <input type="text" id="cliente" name="cliente" placeholder="Ex: João da Silva" required>
+                <input
+                    type="text"
+                    id="cliente"
+                    name="cliente"
+                    placeholder="Ex: João da Silva"
+                    required
+                >
             </div>
             <div class="form-group">
                 <label for="codigo">Código do projeto</label>
-                <input type="text" id="codigo" name="codigo" placeholder="Ex: PRJ-2026-001" required>
+                <input
+                    type="text"
+                    id="codigo"
+                    name="codigo"
+                    placeholder="Ex: PRJ-2026-001"
+                    required
+                >
             </div>
             <div class="form-group">
                 <label for="potencia">Potência do sistema (kWp)</label>
-                <input type="number" step="0.01" id="potencia" name="potencia" placeholder="Ex: 5.4" required>
+                <input
+                    type="number"
+                    step="0.01"
+                    id="potencia"
+                    name="potencia"
+                    placeholder="Ex: 5.4"
+                    required
+                >
             </div>
             <div class="form-group">
                 <label for="cidade">Cidade</label>
-                <input type="text" id="cidade" name="cidade" placeholder="Ex: Salvador" required>
+                <input
+                    type="text"
+                    id="cidade"
+                    name="cidade"
+                    placeholder="Ex: Salvador"
+                    required
+                >
             </div>
             <div class="form-group">
                 <label for="data_troca">Data da troca do medidor</label>
-                <input type="date" id="data_troca" name="data_troca" required>
+                <input
+                    type="date"
+                    id="data_troca"
+                    name="data_troca"
+                    required
+                >
             </div>
             <div class="form-group full-width">
                 <label for="meses_analise">Meses da Análise (Histórico de Geração)</label>
-                <select id="meses_analise" name="meses_analise" required>
-                    <option value="" disabled selected>Selecione a quantidade de meses</option>
+                <select
+                    id="meses_analise"
+                    name="meses_analise"
+                    required
+                >
+                    <option value="" disabled selected>
+                        Selecione a quantidade de meses
+                    </option>
                     <option value="1">1 Mês</option>
                     <option value="2">2 Meses</option>
                     <option value="3">3 Meses</option>
@@ -267,109 +374,89 @@
                 </select>
             </div>
         </div>
-        <div class="page-break"> <!-- Adicionada quebra de página antes da seção -->
-            <div class="section-title">Geração mês a mês</div>
-            <div id="generation-section">
-                <div class="section-title">Geração Histórica (kWh)</div>
-                <div id="dynamic-generation-fields" class="grid-layout"></div>
+        <!-- DADOS DE GERAÇÃO -->
+        <div id="generation-section" style="display: none;">
+            <div class="section-title">
+                Geração Histórica (kWh)
+            </div>
+            <div
+                id="dynamic-generation-fields"
+                class="grid-layout"
+            >
+                <!-- Os inputs serão injetados aqui -->
             </div>
         </div>
-        <div class="page-break"> <!-- Adicionada quebra de página antes da seção (existe para casos futuros) -->
-            <div class="section-title">Detalhamento por mês</div>
-        </div>
-        <button type="submit" class="submit-btn">Salvar Informações</button>
-        <button type="button" id="clearFormBtn" class="clear-btn">Limpar formulário</button>
+        <!-- BOTÕES -->
+        <button
+            type="submit"
+            class="submit-btn"
+        >
+            Salvar Informações
+        </button>
+        <button
+            type="button"
+            id="clearFormBtn"
+            class="clear-btn"
+        >
+            Limpar formulário
+        </button>
     </form>
 </div>
-<div id="successModal" class="modal-overlay">
-    <div class="modal">
-        <div class="modal-icon">✓</div>
-        <h2>Informações salvas!</h2>
-        <p>Os dados foram enviados com sucesso. Você deseja limpar o formulário ou manter as informações preenchidas?</p>
+<!-- =========================
+     POP-UP APÓS SALVAMENTO
+     ========================= -->
+<div
+    id="successModal"
+    class="modal-overlay"
+>
+    <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+    >
+        <div class="modal-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><path d="M20 6L9 17l-5-5"></path></svg>
+        </div>
+        <h2 id="modalTitle">Sucesso!</h2>
+        <p>Dados enviados com sucesso.</p>
         <div class="modal-actions">
-            <button type="button" id="modalClearBtn" class="clear-btn">Limpar formulário</button>
-            <button type="button" id="modalCloseBtn" class="clear-btn">Fechar e manter</button>
+            <button class="modal-close-btn">Fechar</button>
         </div>
     </div>
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('analysisForm');
-        const mesesSelect = document.getElementById('meses_analise');
-        const dynamicContainer = document.getElementById('dynamic-generation-fields');
-        const generationSection = document.getElementById('generation-section');
-        const clearFormBtn = document.getElementById('clearFormBtn');
-        const successModal = document.getElementById('successModal');
-        const modalClearBtn = document.getElementById('modalClearBtn');
-        const modalCloseBtn = document.getElementById('modalCloseBtn');
-        const serverChoiceSelect = document.getElementById('server-choice');
-        mesesSelect.addEventListener('change', function() {
-            const numMeses = parseInt(this.value);
-            dynamicContainer.innerHTML = '';
-            if (isNaN(numMeses) || numMeses <= 0) {
-                dynamicContainer.classList.remove('active');
-                generationSection.style.display = 'none';
-                return;
-            }
-            dynamicContainer.classList.add('active');
-            generationSection.style.display = 'block';
-            const dataAtual = new Date();
-            for (let i = 1; i <= numMeses; i++) {
-                const dataPassada = new Date(dataAtual.getFullYear(), dataAtual.getMonth() - i, 1);
-                let nomeMes = dataPassada.toLocaleString('pt-BR', { month: 'long' });
-                nomeMes = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
-                const ano = dataPassada.getFullYear();
-                const formGroup = document.createElement('div');
-                formGroup.className = 'form-group';
-                const label = document.createElement('label');
-                label.textContent = ${nomeMes} de ${ano};
-                label.setAttribute('for', geracao_${i});
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.step = '0.01';
-                input.id = geracao_${i};
-                input.name = geracao_${nomeMes}_${ano};
-                input.placeholder = 'Geração em kWh';
-                input.required = true;
-                formGroup.appendChild(label);
-                formGroup.appendChild(input);
-                dynamicContainer.appendChild(formGroup);
-            }
-        });
-        function limparFormulario() {
-            form.reset();
-            dynamicContainer.innerHTML = '';
-            dynamicContainer.classList.remove('active');
-            generationSection.style.display = 'none';
-        }
-        clearFormBtn.addEventListener('click', function() {
-            limparFormulario();
-        });
+        const destinationSelect = document.getElementById('destination');
+        const submitBtn = document.querySelector('.submit-btn');
+        const n8nWebhookUrl = 'https://n8n.gaussenergia.com.br/webhook/relatorio-geracao-gauss';
+        const localWebhookUrl = 'https://localhost/webhook/relatorio-geracao-gauss';
+
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const submitBtn = document.querySelector('.submit-btn');
-            const originalBtnText = submitBtn.textContent;
             submitBtn.textContent = 'Enviando...';
             submitBtn.disabled = true;
-            let webhookUrl;
-            const serverChoice = serverChoiceSelect.value;
-            if (serverChoice === 'gauss') {
-                webhookUrl = 'https://n8n.gaussenergia.com.br/webhook/relatorio-geracao-gauss';
-            } else if (serverChoice === 'local') {
-                webhookUrl = 'https://dexterity-copper-resistant.ngrok-free.dev/webhook/relatorio-geracao-gauss';
-            }
+
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
+            const webhookUrl = destinationSelect.value === 'server_gauss' ? n8nWebhookUrl : localWebhookUrl;
+
             try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
+                const response = await fetch(
+                    webhookUrl,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    }
+                );
+
                 if (response.ok) {
-                    successModal.style.display = 'flex';
+                    const successModal = document.getElementById('successModal');
+                    successModal.classList.add('active');
                 } else {
                     alert('Erro ao enviar dados. Verifique a URL do Webhook.');
                 }
@@ -377,29 +464,33 @@
                 console.error('Erro na requisição:', error);
                 alert('Erro de conexão com o servidor.');
             } finally {
-                submitBtn.textContent = originalBtnText;
+                submitBtn.textContent = 'Salvar Informações';
                 submitBtn.disabled = false;
             }
         });
-        modalClearBtn.addEventListener('click', function() {
-            limparFormulario();
-            successModal.style.display = 'none';
-        });
+
+        const modalCloseBtn = document.querySelector('.modal-close-btn');
         modalCloseBtn.addEventListener('click', function() {
-            successModal.style.display = 'none';
+            const successModal = document.getElementById('successModal');
+            successModal.classList.remove('active');
         });
-        successModal.addEventListener('click', function(e) {
-            if (e.target === successModal) {
-                successModal.style.display = 'none';
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const successModal = document.getElementById('successModal');
+                if (successModal.classList.contains('active')) {
+                    successModal.classList.remove('active');
+                }
             }
         });
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && successModal.style.display === 'flex') {
-                successModal.style.display = 'none';
+
+        const successModal = document.getElementById('successModal');
+        successModal.addEventListener('click', function(e) {
+            if (e.target === successModal) {
+                successModal.classList.remove('active');
             }
         });
     });
 </script>
 </body>
 </html>
-```
