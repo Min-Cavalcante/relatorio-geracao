@@ -1,347 +1,304 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/gauss-logo-mark-white.svg" />
     <title>Formulário de Análise - Gauss</title>
-
-
-<!-- Importando a fonte Sora conforme o Design System -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-<style>
-    :root {
-        /* Cores baseadas no Design System da Gauss */
-        --primary-color: #000000;
-        --accent-color: #00D26A;
-        --bg-color: #F7F9FC;
-        --card-bg: #FFFFFF;
-        --text-main: #1E293B;
-        --text-muted: #64748B;
-        --border-color: #E2E8F0;
-        --input-bg: #F8FAFC;
-    }
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: 'Sora', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        padding: 40px 20px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .form-container {
-        background-color: var(--card-bg);
-        max-width: 800px;
-        width: 100%;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        padding: 40px;
-    }
-
-    .form-header {
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .form-header h1 {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--primary-color);
-    }
-
-    .form-header p {
-        font-size: 14px;
-        color: var(--text-muted);
-        margin-top: 8px;
-        font-weight: 300;
-    }
-
-    .section-title {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        color: var(--primary-color);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .section-title::before {
-        content: '';
-        display: block;
-        width: 8px;
-        height: 8px;
-        background-color: var(--accent-color);
-        border-radius: 50%;
-    }
-
-    .grid-layout {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-group.full-width {
-        grid-column: span 2;
-    }
-
-    label {
-        font-size: 13px;
-        font-weight: 600;
-        margin-bottom: 8px;
-        color: var(--text-main);
-    }
-
-    input,
-    select {
-        font-family: 'Sora', sans-serif;
-        padding: 14px 16px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        background-color: var(--input-bg);
-        font-size: 14px;
-        color: var(--text-main);
-        transition: all 0.3s ease;
-    }
-
-    input:focus,
-    select:focus {
-        outline: none;
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.1);
-        background-color: #FFFFFF;
-    }
-
-    input::placeholder {
-        color: #94A3B8;
-    }
-
-    /* Botão principal */
-    button.submit-btn {
-        font-family: 'Sora', sans-serif;
-        background-color: var(--primary-color);
-        color: #FFFFFF;
-        border: none;
-        padding: 16px 24px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        width: 100%;
-        transition: background-color 0.3s ease;
-        margin-top: 10px;
-    }
-
-    button.submit-btn:hover:not(:disabled) {
-        background-color: #333333;
-    }
-
-    button.submit-btn:disabled {
-        background-color: var(--text-muted);
-        cursor: not-allowed;
-        opacity: 0.7;
-    }
-
-    /* Botão limpar */
-    button.clear-btn {
-        font-family: 'Sora', sans-serif;
-        background-color: #FFFFFF;
-        color: #64748B;
-        border: 1px solid var(--border-color);
-        padding: 13px 24px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        width: 100%;
-        transition: all 0.3s ease;
-        margin-top: 10px;
-    }
-
-    button.clear-btn:hover {
-        background-color: #F8FAFC;
-        border-color: #CBD5E1;
-        color: #1E293B;
-    }
-
-    /* Estilização específica para a área dinâmica */
-    #dynamic-generation-fields {
-        background-color: #F8FAFC;
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px dashed var(--border-color);
-        display: none;
-    }
-
-    #dynamic-generation-fields.active {
-        display: grid;
-    }
-
-    /* =========================
-       POP-UP DE SUCESSO
-       ========================= */
-
-    .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background-color: rgba(15, 23, 42, 0.55);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        z-index: 9999;
-        backdrop-filter: blur(3px);
-    }
-
-    .modal-overlay.active {
-        display: flex;
-    }
-
-    .modal {
-        background-color: #FFFFFF;
-        width: 100%;
-        max-width: 450px;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
-        animation: modalAppear 0.2s ease-out;
-    }
-
-    @keyframes modalAppear {
-        from {
-            opacity: 0;
-            transform: translateY(10px) scale(0.98);
+    <!-- Importando a fonte Sora conforme o Design System -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Cores baseadas no Design System da Gauss */
+            --primary-color: #000000;
+            --accent-color: #00D26A;
+            --bg-color: #F7F9FC;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --input-bg: #F8FAFC;
         }
-
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-    }
-
-    .modal-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: rgba(0, 210, 106, 0.12);
-        color: var(--accent-color);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 25px;
-        font-weight: 700;
-        margin-bottom: 18px;
-    }
-
-    .modal h2 {
-        font-size: 20px;
-        color: var(--primary-color);
-        margin-bottom: 10px;
-    }
-
-    .modal p {
-        font-size: 14px;
-        line-height: 1.6;
-        color: var(--text-muted);
-        margin-bottom: 24px;
-    }
-
-    .modal-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    .modal-actions button {
-        flex: 1;
-        font-family: 'Sora', sans-serif;
-        padding: 13px 16px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .modal-clear-btn {
-        background-color: var(--primary-color);
-        color: #FFFFFF;
-        border: 1px solid var(--primary-color);
-    }
-
-    .modal-clear-btn:hover {
-        background-color: #333333;
-    }
-
-    .modal-close-btn {
-        background-color: #FFFFFF;
-        color: var(--text-main);
-        border: 1px solid var(--border-color);
-    }
-
-    .modal-close-btn:hover {
-        background-color: #F8FAFC;
-    }
-
-    @media (max-width: 600px) {
-        .grid-layout {
-            grid-template-columns: 1fr;
+        body {
+            font-family: 'Sora', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
         }
-
-        .form-group.full-width {
-            grid-column: span 1;
-        }
-
         .form-container {
-            padding: 24px;
+            background-color: var(--card-bg);
+            max-width: 800px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 40px;
         }
-
-        .modal {
-            padding: 24px;
+        .form-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
         }
-
-        .modal-actions {
+        .form-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .form-header p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-weight: 300;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+        }
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
             flex-direction: column;
         }
-    }
-</style>
-
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+        input,
+        select {
+            font-family: 'Sora', sans-serif;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            font-size: 14px;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 210, 106, 0.1);
+            background-color: #FFFFFF;
+        }
+        input::placeholder {
+            color: #94A3B8;
+        }
+        /* Botão principal */
+        button.submit-btn {
+            font-family: 'Sora', sans-serif;
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        button.submit-btn:hover:not(:disabled) {
+            background-color: #333333;
+        }
+        button.submit-btn:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        /* Botão limpar */
+        button.clear-btn {
+            font-family: 'Sora', sans-serif;
+            background-color: #FFFFFF;
+            color: #64748B;
+            border: 1px solid var(--border-color);
+            padding: 13px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        button.clear-btn:hover {
+            background-color: #F8FAFC;
+            border-color: #CBD5E1;
+            color: #1E293B;
+        }
+        /* Estilização específica para a área dinâmica */
+        #dynamic-generation-fields {
+            background-color: #F8FAFC;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px dashed var(--border-color);
+            display: none;
+        }
+        #dynamic-generation-fields.active {
+            display: grid;
+        }
+        /* =========================
+           POP-UP DE SUCESSO
+           ========================= */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 9999;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background-color: #FFFFFF;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            animation: modalAppear 0.2s ease-out;
+        }
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(0, 210, 106, 0.12);
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+        .modal h2 {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .modal p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-actions button {
+            flex: 1;
+            font-family: 'Sora', sans-serif;
+            padding: 13px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .modal-clear-btn {
+            background-color: var(--primary-color);
+            color: #FFFFFF;
+            border: 1px solid var(--primary-color);
+        }
+        .modal-clear-btn:hover {
+            background-color: #333333;
+        }
+        .modal-close-btn {
+            background-color: #FFFFFF;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        .modal-close-btn:hover {
+            background-color: #F8FAFC;
+        }
+        @media (max-width: 600px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            .form-container {
+                padding: 24px;
+            }
+            .modal {
+                padding: 24px;
+            }
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
-
 <body>
-
 <div class="form-container">
-
     <div class="form-header">
         <h1>Nova Análise de Sistema</h1>
         <p>Preencha as informações do cliente e o histórico de geração para prosseguir.</p>
     </div>
-
     <form id="analysisForm">
-
+        <!-- SELETOR PARA ESCOLHER O DESTINO DO FLUXO -->
+        <div class="section-title">Destino do Fluxo</div>
+        <div class="grid-layout">
+            <div class="form-group full-width">
+                <label for="destination">Escolha o destino do fluxo</label>
+                <select id="destination" name="destination" required>
+                    <option value="server_gauss" selected>Server Gauss</option>
+                    <option value="local">Local</option>
+                </select>
+            </div>
+        </div>
         <!-- INFORMAÇÕES GERAIS -->
         <div class="section-title">Informações Gerais</div>
-
         <div class="grid-layout">
-
             <div class="form-group full-width">
                 <label for="cliente">Nome do cliente</label>
                 <input
@@ -352,7 +309,6 @@
                     required
                 >
             </div>
-
             <div class="form-group">
                 <label for="codigo">Código do projeto</label>
                 <input
@@ -363,7 +319,6 @@
                     required
                 >
             </div>
-
             <div class="form-group">
                 <label for="potencia">Potência do sistema (kWp)</label>
                 <input
@@ -375,7 +330,6 @@
                     required
                 >
             </div>
-
             <div class="form-group">
                 <label for="cidade">Cidade</label>
                 <input
@@ -386,7 +340,6 @@
                     required
                 >
             </div>
-
             <div class="form-group">
                 <label for="data_troca">Data da troca do medidor</label>
                 <input
@@ -396,10 +349,8 @@
                     required
                 >
             </div>
-
             <div class="form-group full-width">
                 <label for="meses_analise">Meses da Análise (Histórico de Geração)</label>
-
                 <select
                     id="meses_analise"
                     name="meses_analise"
@@ -408,7 +359,6 @@
                     <option value="" disabled selected>
                         Selecione a quantidade de meses
                     </option>
-
                     <option value="1">1 Mês</option>
                     <option value="2">2 Meses</option>
                     <option value="3">3 Meses</option>
@@ -423,25 +373,19 @@
                     <option value="12">12 Meses</option>
                 </select>
             </div>
-
         </div>
-
         <!-- DADOS DE GERAÇÃO -->
         <div id="generation-section" style="display: none;">
-
             <div class="section-title">
                 Geração Histórica (kWh)
             </div>
-
             <div
                 id="dynamic-generation-fields"
                 class="grid-layout"
             >
                 <!-- Os inputs serão injetados aqui -->
             </div>
-
         </div>
-
         <!-- BOTÕES -->
         <button
             type="submit"
@@ -449,7 +393,6 @@
         >
             Salvar Informações
         </button>
-
         <button
             type="button"
             id="clearFormBtn"
@@ -457,406 +400,97 @@
         >
             Limpar formulário
         </button>
-
     </form>
-
 </div>
-
-
 <!-- =========================
      POP-UP APÓS SALVAMENTO
      ========================= -->
-
 <div
     id="successModal"
     class="modal-overlay"
 >
-
     <div
         class="modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modalTitle"
     >
-
         <div class="modal-icon">
-            ✓
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><path d="M20 6L9 17l-5-5"></path></svg>
         </div>
-
-        <h2 id="modalTitle">
-            Informações salvas!
-        </h2>
-
-        <p>
-            Os dados foram enviados com sucesso para a Gauss.
-            Você deseja limpar o formulário ou manter as informações preenchidas?
-        </p>
-
+        <h2 id="modalTitle">Sucesso!</h2>
+        <p>Dados enviados com sucesso.</p>
         <div class="modal-actions">
-
-            <button
-                type="button"
-                id="modalClearBtn"
-                class="modal-clear-btn"
-            >
-                Limpar formulário
-            </button>
-
-            <button
-                type="button"
-                id="modalCloseBtn"
-                class="modal-close-btn"
-            >
-                Fechar e manter
-            </button>
-
+            <button class="modal-close-btn">Fechar</button>
         </div>
-
     </div>
-
 </div>
-
-
 <script>
-
     document.addEventListener('DOMContentLoaded', function() {
-
         const form = document.getElementById('analysisForm');
-
-        const mesesSelect =
-            document.getElementById('meses_analise');
-
-        const dynamicContainer =
-            document.getElementById('dynamic-generation-fields');
-
-        const generationSection =
-            document.getElementById('generation-section');
-
-        const clearFormBtn =
-            document.getElementById('clearFormBtn');
-
-        const successModal =
-            document.getElementById('successModal');
-
-        const modalClearBtn =
-            document.getElementById('modalClearBtn');
-
-        const modalCloseBtn =
-            document.getElementById('modalCloseBtn');
-
-
-        /* ==========================================
-           GERAÇÃO DOS CAMPOS DE HISTÓRICO
-           ========================================== */
-
-        mesesSelect.addEventListener('change', function() {
-
-            const numMeses = parseInt(this.value);
-
-            // Limpa os campos anteriores
-            dynamicContainer.innerHTML = '';
-
-            if (isNaN(numMeses) || numMeses <= 0) {
-
-                dynamicContainer.classList.remove('active');
-
-                generationSection.style.display = 'none';
-
-                return;
-            }
-
-            // Mostra a seção
-            dynamicContainer.classList.add('active');
-
-            generationSection.style.display = 'block';
-
-            const dataAtual = new Date();
-
-            // Cria os campos de forma regressiva
-            for (let i = 1; i <= numMeses; i++) {
-
-                // Mês atual - i
-                const dataPassada = new Date(
-                    dataAtual.getFullYear(),
-                    dataAtual.getMonth() - i,
-                    1
-                );
-
-                // Nome do mês em português
-                let nomeMes =
-                    dataPassada.toLocaleString(
-                        'pt-BR',
-                        {
-                            month: 'long'
-                        }
-                    );
-
-                // Primeira letra maiúscula
-                nomeMes =
-                    nomeMes.charAt(0).toUpperCase() +
-                    nomeMes.slice(1);
-
-                const ano =
-                    dataPassada.getFullYear();
-
-
-                // Form group
-                const formGroup =
-                    document.createElement('div');
-
-                formGroup.className =
-                    'form-group';
-
-
-                // Label
-                const label =
-                    document.createElement('label');
-
-                label.textContent =
-                    `${nomeMes} de ${ano}`;
-
-                label.setAttribute(
-                    'for',
-                    `geracao_${i}`
-                );
-
-
-                // Input
-                const input =
-                    document.createElement('input');
-
-                input.type = 'number';
-
-                input.step = '0.01';
-
-                input.id =
-                    `geracao_${i}`;
-
-                input.name =
-                    `geracao_${nomeMes}_${ano}`;
-
-                input.placeholder =
-                    'Geração em kWh';
-
-                input.required = true;
-
-
-                // Adiciona os elementos
-                formGroup.appendChild(label);
-
-                formGroup.appendChild(input);
-
-                dynamicContainer.appendChild(formGroup);
-
-            }
-
-        });
-
-
-        /* ==========================================
-           FUNÇÃO PARA LIMPAR O FORMULÁRIO
-           ========================================== */
-
-        function limparFormulario() {
-
-            // Reseta campos normais
-            form.reset();
-
-            // Limpa campos dinâmicos
-            dynamicContainer.innerHTML = '';
-
-            // Esconde seção de geração
-            dynamicContainer.classList.remove('active');
-
-            generationSection.style.display = 'none';
-
-        }
-
-
-        /* ==========================================
-           BOTÃO "LIMPAR FORMULÁRIO"
-           ========================================== */
-
-        clearFormBtn.addEventListener('click', function() {
-
-            limparFormulario();
-
-        });
-
-
-        /* ==========================================
-           ENVIO PARA O WEBHOOK DO N8N
-           ========================================== */
+        const destinationSelect = document.getElementById('destination');
+        const submitBtn = document.querySelector('.submit-btn');
+        const n8nWebhookUrl = 'https://n8n.gaussenergia.com.br/webhook/relatorio-geracao-gauss';
+        const localWebhookUrl = 'https://localhost/webhook/relatorio-geracao-gauss';
 
         form.addEventListener('submit', async function(e) {
-
             e.preventDefault();
-
-            // URL DO WEBHOOK DO N8N
-            const n8nWebhookUrl =
-                'https://n8n.gaussenergia.com.br/webhook/relatorio-geracao-gauss';
-
-
-            const submitBtn =
-                document.querySelector('.submit-btn');
-
-            const originalBtnText =
-                submitBtn.textContent;
-
-
-            submitBtn.textContent =
-                'Enviando...';
-
+            submitBtn.textContent = 'Enviando...';
             submitBtn.disabled = true;
 
-
-            // Captura os dados
-            const formData =
-                new FormData(this);
-
-            const data =
-                Object.fromEntries(
-                    formData.entries()
-                );
-
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            const webhookUrl = destinationSelect.value === 'server_gauss' ? n8nWebhookUrl : localWebhookUrl;
 
             try {
-
-                const response =
-                    await fetch(
-                        n8nWebhookUrl,
-                        {
-                            method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body:
-                                JSON.stringify(data)
-                        }
-                    );
-
+                const response = await fetch(
+                    webhookUrl,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    }
+                );
 
                 if (response.ok) {
-
-                    /*
-                     * IMPORTANTE:
-                     * Não limpamos mais o formulário
-                     * automaticamente.
-                     *
-                     * Primeiro mostramos o pop-up.
-                     */
-
+                    const successModal = document.getElementById('successModal');
                     successModal.classList.add('active');
-
                 } else {
-
-                    alert(
-                        'Erro ao enviar dados. Verifique a URL do Webhook.'
-                    );
-
+                    alert('Erro ao enviar dados. Verifique a URL do Webhook.');
                 }
-
             } catch (error) {
-
-                console.error(
-                    'Erro na requisição:',
-                    error
-                );
-
-                alert(
-                    'Erro de conexão com o servidor.'
-                );
-
+                console.error('Erro na requisição:', error);
+                alert('Erro de conexão com o servidor.');
             } finally {
-
-                submitBtn.textContent =
-                    originalBtnText;
-
+                submitBtn.textContent = 'Salvar Informações';
                 submitBtn.disabled = false;
-
             }
-
         });
 
+        const modalCloseBtn = document.querySelector('.modal-close-btn');
+        modalCloseBtn.addEventListener('click', function() {
+            const successModal = document.getElementById('successModal');
+            successModal.classList.remove('active');
+        });
 
-        /* ==========================================
-           POP-UP — LIMPAR
-           ========================================== */
-
-        modalClearBtn.addEventListener(
-            'click',
-            function() {
-
-                limparFormulario();
-
-                successModal.classList.remove('active');
-
-            }
-        );
-
-
-        /* ==========================================
-           POP-UP — FECHAR E MANTER
-           ========================================== */
-
-        modalCloseBtn.addEventListener(
-            'click',
-            function() {
-
-                successModal.classList.remove('active');
-
-            }
-        );
-
-
-        /* ==========================================
-           FECHAR POP-UP CLICANDO FORA
-           ========================================== */
-
-        successModal.addEventListener(
-            'click',
-            function(e) {
-
-                if (e.target === successModal) {
-
-                    successModal.classList.remove(
-                        'active'
-                    );
-
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const successModal = document.getElementById('successModal');
+                if (successModal.classList.contains('active')) {
+                    successModal.classList.remove('active');
                 }
-
             }
-        );
+        });
 
-
-        /* ==========================================
-           ESC FECHA O POP-UP
-           ========================================== */
-
-        document.addEventListener(
-            'keydown',
-            function(e) {
-
-                if (
-                    e.key === 'Escape' &&
-                    successModal.classList.contains('active')
-                ) {
-
-                    successModal.classList.remove(
-                        'active'
-                    );
-
-                }
-
+        const successModal = document.getElementById('successModal');
+        successModal.addEventListener('click', function(e) {
+            if (e.target === successModal) {
+                successModal.classList.remove('active');
             }
-        );
-
+        });
     });
-
 </script>
-
 </body>
 </html>
