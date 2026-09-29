@@ -216,8 +216,8 @@
         <div class="form-group full-width">
             <label for="server-choice">Envie para:</label>
             <select id="server-choice" name="server-choice" required>
-                <option value="" disabled selected>Selecione o destino</option>
-                <option value="gauss">Server Gauss</option>
+                <option value="" disabled>Selecione o destino</option>
+                <option value="gauss" selected>Server Gauss</option>
                 <option value="local">Local</option>
             </select>
         </div>
@@ -292,7 +292,6 @@
         const modalClearBtn = document.getElementById('modalClearBtn');
         const modalCloseBtn = document.getElementById('modalCloseBtn');
         const serverChoiceSelect = document.getElementById('server-choice');
-
         mesesSelect.addEventListener('change', function() {
             const numMeses = parseInt(this.value);
             dynamicContainer.innerHTML = '';
@@ -312,13 +311,13 @@
                 const formGroup = document.createElement('div');
                 formGroup.className = 'form-group';
                 const label = document.createElement('label');
-                label.textContent = `${nomeMes} de ${ano}`;
-                label.setAttribute('for', `geracao_${i}`);
+                label.textContent = ${nomeMes} de ${ano};
+                label.setAttribute('for', geracao_${i});
                 const input = document.createElement('input');
                 input.type = 'number';
                 input.step = '0.01';
-                input.id = `geracao_${i}`;
-                input.name = `geracao_${nomeMes}_${ano}`;
+                input.id = geracao_${i};
+                input.name = geracao_${nomeMes}_${ano};
                 input.placeholder = 'Geração em kWh';
                 input.required = true;
                 formGroup.appendChild(label);
@@ -326,25 +325,21 @@
                 dynamicContainer.appendChild(formGroup);
             }
         });
-
         function limparFormulario() {
             form.reset();
             dynamicContainer.innerHTML = '';
             dynamicContainer.classList.remove('active');
             generationSection.style.display = 'none';
         }
-
         clearFormBtn.addEventListener('click', function() {
             limparFormulario();
         });
-
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             const submitBtn = document.querySelector('.submit-btn');
             const originalBtnText = submitBtn.textContent;
             submitBtn.textContent = 'Enviando...';
             submitBtn.disabled = true;
-
             let webhookUrl;
             const serverChoice = serverChoiceSelect.value;
             if (serverChoice === 'gauss') {
@@ -352,7 +347,6 @@
             } else if (serverChoice === 'local') {
                 webhookUrl = 'https://dexterity-copper-resistant.ngrok-free.dev/webhook/relatorio-geracao-gauss';
             }
-
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
             try {
@@ -376,22 +370,18 @@
                 submitBtn.disabled = false;
             }
         });
-
         modalClearBtn.addEventListener('click', function() {
             limparFormulario();
             successModal.style.display = 'none';
         });
-
         modalCloseBtn.addEventListener('click', function() {
             successModal.style.display = 'none';
         });
-
         successModal.addEventListener('click', function(e) {
             if (e.target === successModal) {
                 successModal.style.display = 'none';
             }
         });
-
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && successModal.style.display === 'flex') {
                 successModal.style.display = 'none';
